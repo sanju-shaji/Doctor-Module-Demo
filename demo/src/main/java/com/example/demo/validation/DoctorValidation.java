@@ -1,10 +1,13 @@
 package com.example.demo.validation;
 
 import com.example.demo.model.DoctorEntity;
+import io.micrometer.common.util.StringUtils;
+import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 import java.util.List;
-
+import java.util.UUID;
+@Component
 public class DoctorValidation {
 
     public boolean isEmptyString(String string){
@@ -18,6 +21,33 @@ public class DoctorValidation {
         }
         return true;
     }
+
+    public boolean isUUIDValid(UUID id){
+        return id.toString().length()==36;
+    }
+    public List<String> isValidUUID(String id){
+        List<String> errorMessage=new ArrayList<>();
+         try {
+            if(StringUtils.isBlank(id)){
+                errorMessage.add("You are not providing an ID. Please provide a UUID");
+                return errorMessage;
+            }
+            UUID.fromString(id);
+            return errorMessage;
+        }catch (IllegalArgumentException illegalArgumentException){
+            errorMessage.add("Invalid Id. Please provide a valid UUID");
+            return errorMessage;
+        }
+    }
+
+////   public List <String> validateUUID(String id){
+////        List<String>errorMessage=new ArrayList<>();
+////        if(id.isEmpty()){
+////            errorMessage.add("Please provide UUID for retrieving data");
+////        }
+////        errorMessage.add("Invalid Id. Please provide a valid UUID");
+////        return errorMessage;
+//   }
 
     public boolean isValidDepartmentName(String string){
         String departmentNamePattern="^[a-zA-Z\\s\\-'.,]+$";
