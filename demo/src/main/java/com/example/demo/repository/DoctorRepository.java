@@ -1,9 +1,9 @@
-package com.example.demo.dao;
+package com.example.demo.repository;
 
 import com.example.demo.model.DoctorEntity;
 import org.springframework.data.mongodb.repository.MongoRepository;
 
 import java.util.UUID;
 
-public interface DoctorRepo extends MongoRepository<DoctorEntity, UUID> {
+public interface DoctorRepository extends MongoRepository<DoctorEntity, UUID> {
 }

@@ -6,7 +6,7 @@ import lombok.Setter;
 import java.util.List;
 @Getter
 @Setter
-public class BaseDto {
+public class ResponseDto {
    public boolean success;
    public List<String> error;
 }

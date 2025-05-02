@@ -1,13 +1,15 @@
 package com.example.demo.service;
 
-import com.example.demo.dto.DoctorDto;
+import com.example.demo.dto.DoctorResponseDto;
 import com.example.demo.model.DoctorEntity;
-import com.example.demo.dao.DoctorRepo;
+import com.example.demo.repository.DoctorRepository;
 import com.example.demo.validation.DoctorValidation;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatusCode;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import org.springframework.util.ObjectUtils;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -16,26 +18,30 @@ import java.util.UUID;
 public class DoctorServiceImpl implements DoctorService {
 
     @Autowired
-    DoctorRepo docRepo;
+    DoctorRepository docRepo;
 
 
     @Override
-    public DoctorDto createDoctor(DoctorDto doctorDto) {
-        DoctorEntity doctorEntity=new DoctorEntity(doctorDto);
+    public ResponseEntity<DoctorResponseDto> createDoctor(DoctorResponseDto doctorResponseDto) {
+        DoctorEntity doctorEntity=new DoctorEntity();
+       doctorEntity.setId(UUID.randomUUID());
+       doctorEntity.setFirstName(doctorResponseDto.getFirstName().trim());
+       doctorEntity.setLastName(doctorResponseDto.getLastName().trim());
+       doctorEntity.setDepartment(doctorResponseDto.getDepartment());
         DoctorEntity saveDoctor;
         DoctorValidation doctorValidation=new DoctorValidation();
        List<String> validateInput= doctorValidation.validatePostDoctor(doctorEntity);
        if(!validateInput.isEmpty()){
-           DoctorDto errorResponseDto=new DoctorDto();
+           DoctorResponseDto errorResponseDto=new DoctorResponseDto();
            errorResponseDto.setSuccess(false);
            errorResponseDto.setError(validateInput);
-            return errorResponseDto;
+            return ResponseEntity.status(HttpStatusCode.valueOf(400)).body(errorResponseDto) ;
        }
        saveDoctor=docRepo.save(doctorEntity);
-        DoctorDto responseDto=new DoctorDto(saveDoctor);
+        DoctorResponseDto responseDto=new DoctorResponseDto(saveDoctor);
         responseDto.setSuccess(true);
         responseDto.setError(null);
-        return responseDto;
+        return ResponseEntity.ok(responseDto) ;
     }
 
     @Override
@@ -50,8 +56,22 @@ public class DoctorServiceImpl implements DoctorService {
     }
 
     @Override
-    public DoctorEntity getDoctorsById(UUID id) {
-        Optional<DoctorEntity> response =docRepo.findById(id);
-        return response.get();
+    public ResponseEntity<DoctorResponseDto> getDoctorsById(UUID id) {
+        DoctorResponseDto responseDto=new DoctorResponseDto();
+        Optional<DoctorEntity> doctorEntity =docRepo.findById(id);
+        if(doctorEntity.isPresent()){
+        responseDto.setSuccess(true);
+        responseDto.setId(doctorEntity.get().getId());
+        responseDto.setFirstName(doctorEntity.get().getFirstName());
+        responseDto.setLastName(doctorEntity.get().getLastName());
+        responseDto.setDepartment(doctorEntity.get().getDepartment());
+        responseDto.setError(null);
+        return ResponseEntity.ok().body(responseDto);
+        }
+        List<String> invalidUUID=new ArrayList<>();
+        invalidUUID.add("User Not Found In Database");
+        responseDto.setSuccess(false);
+        responseDto.setError(invalidUUID);
+        return ResponseEntity.status(400).body(responseDto);
     }
 }

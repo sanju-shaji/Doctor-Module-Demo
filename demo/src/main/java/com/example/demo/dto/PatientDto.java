@@ -1,18 +1,18 @@
 package com.example.demo.dto;
 
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.util.UUID;
 
-/**
- * DTO representing doctor details for data transfer.
- */
 @Data
+@NoArgsConstructor
+@AllArgsConstructor
 @Builder
-public class DoctorDto {
+public class PatientDto {
     private UUID id;
     private String firstName;
     private String lastName;
-    private String department;
 }
